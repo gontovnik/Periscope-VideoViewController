@@ -15,6 +15,14 @@ Tutorial on how to create this component can be found [here](https://medium.com/
 
 Open and run the **VideoViewControllerExample** project in Xcode to see this component in action.
 
+## Example usage
+
+``` swift
+let videoURL = NSBundle.mainBundle().URLForResource("exampleVideo", withExtension: "mp4")!
+let videoViewController = VideoViewController(videoURL: videoURL)
+presentViewController(videoViewController, animated: true, completion: nil)
+```
+
 ## Installation
 
 ### Cocoapods
