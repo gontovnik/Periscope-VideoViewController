@@ -1,15 +1,29 @@
+// VideoViewController.swift
 //
-//  VideoViewController.swift
-//  VideoViewControllerExample
+// Copyright (c) 2016 Danil Gontovnik (http://gontovnik.com/)
 //
-//  Created by Danil Gontovnik on 1/4/16.
-//  Copyright © 2016 Danil Gontovnik. All rights reserved.
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
 //
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
 
 import UIKit
 import AVFoundation
 
-class VideoViewController: UIViewController {
+public class VideoViewController: UIViewController {
     
     // MARK: - Vars
 
@@ -27,45 +41,49 @@ class VideoViewController: UIViewController {
     
     private let rewindDimView = UIVisualEffectView()
     private let rewindContentView = UIView()
-    private let rewindTimelineView = TimelineView()
-    
+    public let rewindTimelineView = TimelineView()
     private let rewindPreviewShadowLayer = CALayer()
     private let rewindPreviewImageView = UIImageView()
     private let rewindCurrentTimeLabel = UILabel()
 
-    var rewindPreviewMaxHeight: CGFloat = 112.0 {
+    /// Indicates the maximum height of rewindPreviewImageView. Default value is 112.
+    public var rewindPreviewMaxHeight: CGFloat = 112.0 {
         didSet {
             assetGenerator.maximumSize = CGSize(width: CGFloat.max, height: rewindPreviewMaxHeight * UIScreen.mainScreen().scale)
         }
     }
+    
+    /// Indicates whether player should start playing on viewDidLoad. Default is true. 
+    public var autoplays: Bool = true
 
     // MARK: - Constructors
 
-    init(videoURL: NSURL) {
+    /**
+        Returns an initialized VideoViewController object
+    
+        - Parameter videoURL: Local URL to the video asset 
+    */
+    public init(videoURL: NSURL) {
         super.init(nibName: nil, bundle: nil)
         
         self.videoURL = videoURL
         
         asset = AVURLAsset(URL: videoURL)
-        
         playerItem = AVPlayerItem(asset: asset)
-        
         player = AVPlayer(playerItem: playerItem)
-        player.actionAtItemEnd = .None
-        
         playerLayer = AVPlayerLayer(player: player)
-        
+
         assetGenerator = AVAssetImageGenerator(asset: asset)
         assetGenerator.maximumSize = CGSize(width: CGFloat.max, height: rewindPreviewMaxHeight * UIScreen.mainScreen().scale)
     }
 
-    required init?(coder aDecoder: NSCoder) {
+    required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
     // MARK: -
 
-    override func loadView() {
+    override public func loadView() {
         super.loadView()
         
         view.backgroundColor = .blackColor()
@@ -95,7 +113,10 @@ class VideoViewController: UIViewController {
 
                 dispatch_async(dispatch_get_main_queue()) {
                     strongSelf.rewindPreviewImageView.image = image
-                    strongSelf.layoutRewindPreviewImageViewIfNeeded()
+                    
+                    if strongSelf.rewindPreviewImageView.bounds.size != image.size {
+                        strongSelf.viewWillLayoutSubviews()
+                    }
                 }
             }
         }
@@ -121,15 +142,27 @@ class VideoViewController: UIViewController {
         rewindContentView.addSubview(rewindPreviewImageView)
     }
 
-    override func viewDidLoad() {
+    override public func viewDidLoad() {
         super.viewDidLoad()
         
-        player.play()
+        if autoplays {
+            play()
+        }
     }
 
     // MARK: - Methods
     
-    func longPressed(gesture: UILongPressGestureRecognizer) {
+    /// Resumes playback
+    public func play() {
+        player.play()
+    }
+    
+    /// Pauses playback
+    public func pause() {
+        player.pause()
+    }
+    
+    public func longPressed(gesture: UILongPressGestureRecognizer) {
         let location = gesture.locationInView(gesture.view!)
         rewindTimelineView.zoom = (location.y - rewindTimelineView.center.y - 10.0) / 30.0
         
@@ -141,7 +174,7 @@ class VideoViewController: UIViewController {
                 self.rewindContentView.alpha = 1.0
                 }, completion: nil)
         } else if gesture.state == .Changed {
-            rewindTimelineView.rewindByWidth(previousLocationX - location.x)
+            rewindTimelineView.rewindByDistance(previousLocationX - location.x)
         } else {
             player.play()
             
@@ -159,13 +192,13 @@ class VideoViewController: UIViewController {
         }
     }
 
-    override func prefersStatusBarHidden() -> Bool {
+    override public func prefersStatusBarHidden() -> Bool {
         return true
     }
 
     // MARK: - Layout
 
-    override func viewWillLayoutSubviews() {
+    override public func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         
         playerLayer.frame = view.bounds
@@ -180,18 +213,8 @@ class VideoViewController: UIViewController {
         rewindPreviewImageView.frame = CGRect(x: (rewindContentView.bounds.width - rewindPreviewImageViewWidth) / 2.0, y: (rewindContentView.bounds.height - rewindPreviewMaxHeight - verticalSpacing - rewindCurrentTimeLabel.bounds.height - verticalSpacing - timelineHeight) / 2.0, width: rewindPreviewImageViewWidth, height: rewindPreviewMaxHeight)
         rewindCurrentTimeLabel.frame = CGRect(x: 0.0, y: rewindPreviewImageView.frame.maxY + verticalSpacing, width: rewindTimelineView.bounds.width, height: rewindCurrentTimeLabel.frame.height)
         rewindTimelineView.frame = CGRect(x: 0.0, y: rewindCurrentTimeLabel.frame.maxY + verticalSpacing, width: rewindContentView.bounds.width, height: timelineHeight)
-        
-        layoutRewindPreviewImageViewIfNeeded()
-    }
-    
-    private func layoutRewindPreviewImageViewIfNeeded() {
-        guard let image = rewindPreviewImageView.image where rewindPreviewImageView.bounds.size != image.size else {
-            return
-        }
-        
-        rewindPreviewImageView.frame = CGRect(x: (rewindContentView.bounds.width - image.size.width) / 2.0, y: rewindPreviewImageView.frame.minY, width: image.size.width, height: rewindPreviewImageView.bounds.height)
         rewindPreviewShadowLayer.frame = rewindPreviewImageView.frame
-
+        
         let path = UIBezierPath(roundedRect: rewindPreviewImageView.bounds, cornerRadius: 5.0).CGPath
         rewindPreviewShadowLayer.shadowPath = path
         (rewindPreviewImageView.layer.mask as! CAShapeLayer).path = path

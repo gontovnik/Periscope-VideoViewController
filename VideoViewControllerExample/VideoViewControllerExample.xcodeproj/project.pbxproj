@@ -13,8 +13,8 @@
 		05F686971C3B1695000CDF62 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 05F686961C3B1695000CDF62 /* Assets.xcassets */; };
 		05F6869A1C3B1695000CDF62 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 05F686981C3B1695000CDF62 /* LaunchScreen.storyboard */; };
 		05F686A61C3B1A28000CDF62 /* exampleVideo.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 05F686A51C3B1A28000CDF62 /* exampleVideo.mp4 */; };
-		05F686AC1C3BF770000CDF62 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F686AA1C3BF770000CDF62 /* TimelineView.swift */; };
-		05F686AD1C3BF770000CDF62 /* VideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05F686AB1C3BF770000CDF62 /* VideoViewController.swift */; };
+		F00876D81C4D12F500C099E8 /* TimelineView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00876D61C4D12F500C099E8 /* TimelineView.swift */; };
+		F00876D91C4D12F500C099E8 /* VideoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00876D71C4D12F500C099E8 /* VideoViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,8 +26,8 @@
 		05F686991C3B1695000CDF62 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		05F6869B1C3B1695000CDF62 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		05F686A51C3B1A28000CDF62 /* exampleVideo.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = exampleVideo.mp4; sourceTree = "<group>"; };
-		05F686AA1C3BF770000CDF62 /* TimelineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
-		05F686AB1C3BF770000CDF62 /* VideoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoViewController.swift; sourceTree = "<group>"; };
+		F00876D61C4D12F500C099E8 /* TimelineView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimelineView.swift; sourceTree = "<group>"; };
+		F00876D71C4D12F500C099E8 /* VideoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -60,7 +60,7 @@
 		05F6868E1C3B1695000CDF62 /* VideoViewControllerExample */ = {
 			isa = PBXGroup;
 			children = (
-				05F686A91C3BF770000CDF62 /* VideoViewController */,
+				F00876D51C4D12F500C099E8 /* VideoViewController */,
 				05F686A41C3B1A28000CDF62 /* Resources */,
 				05F6868F1C3B1695000CDF62 /* AppDelegate.swift */,
 				05F686911C3B1695000CDF62 /* ViewController.swift */,
@@ -80,13 +80,14 @@
 			path = Resources;
 			sourceTree = "<group>";
 		};
-		05F686A91C3BF770000CDF62 /* VideoViewController */ = {
+		F00876D51C4D12F500C099E8 /* VideoViewController */ = {
 			isa = PBXGroup;
 			children = (
-				05F686AA1C3BF770000CDF62 /* TimelineView.swift */,
-				05F686AB1C3BF770000CDF62 /* VideoViewController.swift */,
+				F00876D61C4D12F500C099E8 /* TimelineView.swift */,
+				F00876D71C4D12F500C099E8 /* VideoViewController.swift */,
 			);
-			path = VideoViewController;
+			name = VideoViewController;
+			path = ../../VideoViewController;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -162,8 +163,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				05F686921C3B1695000CDF62 /* ViewController.swift in Sources */,
-				05F686AC1C3BF770000CDF62 /* TimelineView.swift in Sources */,
-				05F686AD1C3BF770000CDF62 /* VideoViewController.swift in Sources */,
+				F00876D81C4D12F500C099E8 /* TimelineView.swift in Sources */,
+				F00876D91C4D12F500C099E8 /* VideoViewController.swift in Sources */,
 				05F686901C3B1695000CDF62 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -314,6 +315,7 @@
 				05F686A01C3B1695000CDF62 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
