@@ -25,7 +25,7 @@ presentViewController(videoViewController, animated: true, completion: nil)
 
 ## Installation
 
-### Cocoapods
+### CocoaPods
 
 ``` ruby
 pod 'VideoViewController'
