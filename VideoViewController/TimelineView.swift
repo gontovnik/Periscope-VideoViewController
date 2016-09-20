@@ -22,24 +22,24 @@
 
 import UIKit
 
-public class TimelineView: UIView {
+open class TimelineView: UIView {
     
     // MARK: -  Vars
     
     /// The duration of the video in seconds.
-    public var duration: NSTimeInterval = 0.0 {
+    open var duration: TimeInterval = 0.0 {
         didSet { setNeedsDisplay() }
     }
 
     /// Time in seconds when rewind began.
-    public var initialTime: NSTimeInterval = 0.0 {
+    open var initialTime: TimeInterval = 0.0 {
         didSet {
             currentTime = initialTime
         }
     }
 
     /// Current timeline time in seconds.
-    public var currentTime: NSTimeInterval = 0.0 {
+    open var currentTime: TimeInterval = 0.0 {
         didSet {
             setNeedsDisplay()
             currentTimeDidChange?(currentTime)
@@ -47,45 +47,45 @@ public class TimelineView: UIView {
     }
 
     /// Internal zoom variable.
-    private var _zoom: CGFloat = 1.0 {
+    fileprivate var _zoom: CGFloat = 1.0 {
         didSet { setNeedsDisplay() }
     }
 
     /// The zoom of the timeline view. The higher zoom value, the more accurate rewind is. Default is 1.0.
-    public var zoom: CGFloat {
+    open var zoom: CGFloat {
         get { return _zoom }
         set { _zoom = max(min(newValue, maxZoom), minZoom) }
     }
 
     /// Indicates minimum zoom value. Default is 1.0.
-    public var minZoom: CGFloat = 1.0 {
+    open var minZoom: CGFloat = 1.0 {
         didSet { zoom = _zoom }
     }
 
     /// Indicates maximum zoom value. Default is 3.5.
-    public var maxZoom: CGFloat = 3.5 {
+    open var maxZoom: CGFloat = 3.5 {
         didSet { zoom = _zoom }
     }
 
     /// The width of a line representing a specific time interval on a timeline. If zoom is not equal 1, then actual interval width equals to intervalWidth * zoom. Value will be used during rewind for calculations — for example, if zoom is 1, intervalWidth is 30 and intervalDuration is 15, then when user moves 10pixels left or right we will rewind by +5 or -5 seconds;
-    public var intervalWidth: CGFloat = 24.0 {
+    open var intervalWidth: CGFloat = 24.0 {
         didSet { setNeedsDisplay() }
     }
 
     /// The duration of an interval in seconds. If video is 55 seconds and interval is 15 seconds — then we will have 3 full intervals and one not full interval. Value will be used during rewind for calculations.
-    public var intervalDuration: CGFloat = 15.0 {
+    open var intervalDuration: CGFloat = 15.0 {
         didSet { setNeedsDisplay() }
     }
     
     /// Block which will be triggered everytime currentTime value changes.
-    public var currentTimeDidChange: ((NSTimeInterval) -> ())?
+    open var currentTimeDidChange: ((TimeInterval) -> ())?
     
     // MARK: - Constructors
     
     public init() {
         super.init(frame: .zero)
         
-        opaque = false
+        isOpaque = false
     }
 
     required public init?(coder aDecoder: NSCoder) {
@@ -97,7 +97,7 @@ public class TimelineView: UIView {
     /**
         Calculate current interval width. It takes two variables in count - intervalWidth and zoom.
     */
-    private func currentIntervalWidth() -> CGFloat {
+    fileprivate func currentIntervalWidth() -> CGFloat {
         return intervalWidth * zoom
     }
 
@@ -106,8 +106,8 @@ public class TimelineView: UIView {
      
         - Parameter width: The distance.
     */
-    public func timeIntervalFromDistance(distance: CGFloat) -> NSTimeInterval {
-        return NSTimeInterval(distance * intervalDuration / currentIntervalWidth())
+    open func timeIntervalFromDistance(_ distance: CGFloat) -> TimeInterval {
+        return TimeInterval(distance * intervalDuration / currentIntervalWidth())
     }
 
     /**
@@ -115,7 +115,7 @@ public class TimelineView: UIView {
         
         - Parameter duration: The duration of an interval.
     */
-    public func distanceFromTimeInterval(timeInterval: NSTimeInterval) -> CGFloat {
+    open func distanceFromTimeInterval(_ timeInterval: TimeInterval) -> CGFloat {
         return currentIntervalWidth() * CGFloat(timeInterval) / intervalDuration
     }
 
@@ -124,15 +124,15 @@ public class TimelineView: UIView {
      
         - Parameter distance: The distance how far it should rewind by.
     */
-    public func rewindByDistance(distance: CGFloat) {
+    open func rewindByDistance(_ distance: CGFloat) {
         let newCurrentTime = currentTime + timeIntervalFromDistance(distance)
         currentTime = max(min(newCurrentTime, duration), 0.0)
     }
     
     // MARK: - Draw
     
-    override public func drawRect(rect: CGRect) {
-        super.drawRect(rect)
+    override open func draw(_ rect: CGRect) {
+        super.draw(rect)
         
         let intervalWidth = currentIntervalWidth()
         
@@ -144,30 +144,30 @@ public class TimelineView: UIView {
         let intervalsCount = CGFloat(duration) / intervalDuration
         
         // Draw full line
-        CGContextSetFillColorWithColor(context, UIColor(white: 0.45, alpha: 1.0).CGColor)
+        context?.setFillColor(UIColor(white: 0.45, alpha: 1.0).cgColor)
         
-        let totalPath = UIBezierPath(roundedRect: CGRect(x: originX, y: 0.0, width: intervalWidth * intervalsCount, height: lineHeight), cornerRadius: lineHeight).CGPath
-        CGContextAddPath(context, totalPath)
-        CGContextFillPath(context)
+        let totalPath = UIBezierPath(roundedRect: CGRect(x: originX, y: 0.0, width: intervalWidth * intervalsCount, height: lineHeight), cornerRadius: lineHeight).cgPath
+        context?.addPath(totalPath)
+        context?.fillPath()
         
         // Draw elapsed line
-        CGContextSetFillColorWithColor(context, UIColor.whiteColor().CGColor)
+        context?.setFillColor(UIColor.white.cgColor)
         
-        let elapsedPath = UIBezierPath(roundedRect: CGRect(x: originX, y: 0.0, width: distanceFromTimeInterval(currentTime), height: lineHeight), cornerRadius: lineHeight).CGPath
-        CGContextAddPath(context, elapsedPath)
-        CGContextFillPath(context)
+        let elapsedPath = UIBezierPath(roundedRect: CGRect(x: originX, y: 0.0, width: distanceFromTimeInterval(currentTime), height: lineHeight), cornerRadius: lineHeight).cgPath
+        context?.addPath(elapsedPath)
+        context?.fillPath()
         
         // Draw current time dot
-        CGContextFillEllipseInRect(context, CGRect(x: originX + distanceFromTimeInterval(initialTime), y: 7.0, width: 3.0, height: 3.0))
+        context?.fillEllipse(in: CGRect(x: originX + distanceFromTimeInterval(initialTime), y: 7.0, width: 3.0, height: 3.0))
         
         // Draw full line separators
-        CGContextSetFillColorWithColor(context, UIColor(white: 0.0, alpha: 0.5).CGColor)
+        context?.setFillColor(UIColor(white: 0.0, alpha: 0.5).cgColor)
         
         var intervalIdx: CGFloat = 0.0
         repeat {
             intervalIdx += 1.0
             if intervalsCount - intervalIdx > 0.0 {
-                CGContextFillRect(context, CGRect(x: originX + intervalWidth * intervalIdx, y: 0.0, width: 1.0, height: lineHeight))
+                context?.fill(CGRect(x: originX + intervalWidth * intervalIdx, y: 0.0, width: 1.0, height: lineHeight))
             }
         } while intervalIdx < intervalsCount
     }

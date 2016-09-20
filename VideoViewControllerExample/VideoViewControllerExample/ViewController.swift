@@ -12,12 +12,12 @@ class ViewController: UIViewController {
     
     // MARK: -
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        let videoURL = NSBundle.mainBundle().URLForResource("exampleVideo", withExtension: "mp4")!
+        let videoURL = Bundle.main.url(forResource: "exampleVideo", withExtension: "mp4")!
         let videoViewController = VideoViewController(videoURL: videoURL)
-        presentViewController(videoViewController, animated: true, completion: nil)
+        present(videoViewController, animated: true, completion: nil)
     }
 
 }

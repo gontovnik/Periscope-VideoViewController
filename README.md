@@ -1,7 +1,7 @@
 # Periscope-VideoViewController
 Video view controller with [Periscope](https://itunes.apple.com/us/app/periscope/id972909677?mt=8) fast rewind control.
 
-Tutorial on how to create this component can be found [here](https://medium.com/@gontovnik/building-periscope-fast-rewind-control-for-ios-5cb6801db0fd#.go2t3gdec). 
+Tutorial on how to create this component can be found [here](https://medium.com/@gontovnik/building-periscope-fast-rewind-control-for-ios-5cb6801db0fd#.go2t3gdec).
 
 ![](https://raw.githubusercontent.com/gontovnik/Periscope-VideoViewController/master/VideoViewController.gif)
 
@@ -9,7 +9,7 @@ Tutorial on how to create this component can be found [here](https://medium.com/
 * Xcode 7 or higher
 * iOS 8.0 or higher (may work on previous versions, just did not test it)
 * ARC
-* Swift 2.0
+* Swift 3.0
 
 ## Demo
 
@@ -18,9 +18,9 @@ Open and run the **VideoViewControllerExample** project in Xcode to see this com
 ## Example usage
 
 ``` swift
-let videoURL = NSBundle.mainBundle().URLForResource("exampleVideo", withExtension: "mp4")!
+let videoURL = Bundle.main.url(forResource: "exampleVideo", withExtension: "mp4")!
 let videoViewController = VideoViewController(videoURL: videoURL)
-presentViewController(videoViewController, animated: true, completion: nil)
+present(videoViewController, animated: true, completion: nil)
 ```
 
 ## Installation
@@ -47,9 +47,6 @@ Danil Gontovnik
 - https://twitter.com/gontovnik
 - http://gontovnik.com/
 - danil@gontovnik.com
-
-I write here: https://medium.com/@gontovnik/
-And here: http://iostuts.io/author/danil-gontovnik/
 
 ## License
 

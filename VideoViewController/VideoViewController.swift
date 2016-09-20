@@ -23,38 +23,38 @@
 import UIKit
 import AVFoundation
 
-public class VideoViewController: UIViewController {
+open class VideoViewController: UIViewController {
     
     // MARK: - Vars
 
-    private var videoURL: NSURL!
+    fileprivate var videoURL: URL!
 
-    private var asset: AVURLAsset!
-    private var playerItem: AVPlayerItem!
-    private var player: AVPlayer!
-    private var playerLayer: AVPlayerLayer!
-    private var assetGenerator: AVAssetImageGenerator!
+    fileprivate var asset: AVURLAsset!
+    fileprivate var playerItem: AVPlayerItem!
+    fileprivate var player: AVPlayer!
+    fileprivate var playerLayer: AVPlayerLayer!
+    fileprivate var assetGenerator: AVAssetImageGenerator!
     
-    private var longPressGestureRecognizer: UILongPressGestureRecognizer!
+    fileprivate var longPressGestureRecognizer: UILongPressGestureRecognizer!
     
-    private var previousLocationX: CGFloat = 0.0
+    fileprivate var previousLocationX: CGFloat = 0.0
     
-    private let rewindDimView = UIVisualEffectView()
-    private let rewindContentView = UIView()
-    public let rewindTimelineView = TimelineView()
-    private let rewindPreviewShadowLayer = CALayer()
-    private let rewindPreviewImageView = UIImageView()
-    private let rewindCurrentTimeLabel = UILabel()
+    fileprivate let rewindDimView = UIVisualEffectView()
+    fileprivate let rewindContentView = UIView()
+    open let rewindTimelineView = TimelineView()
+    fileprivate let rewindPreviewShadowLayer = CALayer()
+    fileprivate let rewindPreviewImageView = UIImageView()
+    fileprivate let rewindCurrentTimeLabel = UILabel()
 
     /// Indicates the maximum height of rewindPreviewImageView. Default value is 112.
-    public var rewindPreviewMaxHeight: CGFloat = 112.0 {
+    open var rewindPreviewMaxHeight: CGFloat = 112.0 {
         didSet {
-            assetGenerator.maximumSize = CGSize(width: CGFloat.max, height: rewindPreviewMaxHeight * UIScreen.mainScreen().scale)
+            assetGenerator.maximumSize = CGSize(width: CGFloat.greatestFiniteMagnitude, height: rewindPreviewMaxHeight * UIScreen.main.scale)
         }
     }
     
     /// Indicates whether player should start playing on viewDidLoad. Default is true. 
-    public var autoplays: Bool = true
+    open var autoplays: Bool = true
 
     // MARK: - Constructors
 
@@ -63,18 +63,18 @@ public class VideoViewController: UIViewController {
     
         - Parameter videoURL: Local URL to the video asset 
     */
-    public init(videoURL: NSURL) {
+    public init(videoURL: URL) {
         super.init(nibName: nil, bundle: nil)
         
         self.videoURL = videoURL
         
-        asset = AVURLAsset(URL: videoURL)
+        asset = AVURLAsset(url: videoURL)
         playerItem = AVPlayerItem(asset: asset)
         player = AVPlayer(playerItem: playerItem)
         playerLayer = AVPlayerLayer(player: player)
 
         assetGenerator = AVAssetImageGenerator(asset: asset)
-        assetGenerator.maximumSize = CGSize(width: CGFloat.max, height: rewindPreviewMaxHeight * UIScreen.mainScreen().scale)
+        assetGenerator.maximumSize = CGSize(width: CGFloat.greatestFiniteMagnitude, height: rewindPreviewMaxHeight * UIScreen.main.scale)
     }
 
     required public init?(coder aDecoder: NSCoder) {
@@ -83,13 +83,13 @@ public class VideoViewController: UIViewController {
 
     // MARK: -
 
-    override public func loadView() {
+    override open func loadView() {
         super.loadView()
         
-        view.backgroundColor = .blackColor()
+        view.backgroundColor = .black
         view.layer.addSublayer(playerLayer)
         
-        longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: Selector("longPressed:"))
+        longPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(VideoViewController.longPressed(_:)))
         view.addGestureRecognizer(longPressGestureRecognizer)
         
         view.addSubview(rewindDimView)
@@ -99,7 +99,7 @@ public class VideoViewController: UIViewController {
         
         rewindTimelineView.duration = CMTimeGetSeconds(asset.duration)
         rewindTimelineView.currentTimeDidChange = { [weak self] (currentTime) in
-            guard let strongSelf = self, playerItem = strongSelf.playerItem, assetGenerator = strongSelf.assetGenerator else { return }
+            guard let strongSelf = self, let playerItem = strongSelf.playerItem, let assetGenerator = strongSelf.assetGenerator else { return }
             
             let minutesInt = Int(currentTime / 60.0)
             let secondsInt = Int(currentTime) - minutesInt * 60
@@ -107,11 +107,11 @@ public class VideoViewController: UIViewController {
             
             let requestedTime = CMTime(seconds: currentTime, preferredTimescale: playerItem.currentTime().timescale)
             
-            assetGenerator.generateCGImagesAsynchronouslyForTimes([NSValue(CMTime: requestedTime)]) { [weak self] (_, CGImage, _, _, _) in
-                guard let strongSelf = self, CGImage = CGImage else { return }
-                let image = UIImage(CGImage: CGImage, scale: UIScreen.mainScreen().scale, orientation: .Up)
+            assetGenerator.generateCGImagesAsynchronously(forTimes: [NSValue(time: requestedTime)]) { [weak self] (_, CGImage, _, _, _) in
+                guard let strongSelf = self, let CGImage = CGImage else { return }
+                let image = UIImage(cgImage: CGImage, scale: UIScreen.main.scale, orientation: .up)
 
-                dispatch_async(dispatch_get_main_queue()) {
+                DispatchQueue.main.async {
                     strongSelf.rewindPreviewImageView.image = image
                     
                     if strongSelf.rewindPreviewImageView.bounds.size != image.size {
@@ -123,26 +123,26 @@ public class VideoViewController: UIViewController {
         rewindContentView.addSubview(rewindTimelineView)
         
         rewindCurrentTimeLabel.text = " "
-        rewindCurrentTimeLabel.font = .systemFontOfSize(16.0)
-        rewindCurrentTimeLabel.textColor = .whiteColor()
-        rewindCurrentTimeLabel.textAlignment = .Center
+        rewindCurrentTimeLabel.font = .systemFont(ofSize: 16.0)
+        rewindCurrentTimeLabel.textColor = .white
+        rewindCurrentTimeLabel.textAlignment = .center
         rewindCurrentTimeLabel.sizeToFit()
         rewindContentView.addSubview(rewindCurrentTimeLabel)
         
         rewindPreviewShadowLayer.shadowOpacity = 1.0
-        rewindPreviewShadowLayer.shadowColor = UIColor(white: 0.1, alpha: 1.0).CGColor
+        rewindPreviewShadowLayer.shadowColor = UIColor(white: 0.1, alpha: 1.0).cgColor
         rewindPreviewShadowLayer.shadowRadius = 15.0
         rewindPreviewShadowLayer.shadowOffset = .zero
         rewindPreviewShadowLayer.masksToBounds = false
         rewindPreviewShadowLayer.actions = ["position": NSNull(), "bounds": NSNull(), "shadowPath": NSNull()]
         rewindContentView.layer.addSublayer(rewindPreviewShadowLayer)
 
-        rewindPreviewImageView.contentMode = .ScaleAspectFit
+        rewindPreviewImageView.contentMode = .scaleAspectFit
         rewindPreviewImageView.layer.mask = CAShapeLayer()
         rewindContentView.addSubview(rewindPreviewImageView)
     }
 
-    override public func viewDidLoad() {
+    override open func viewDidLoad() {
         super.viewDidLoad()
         
         if autoplays {
@@ -153,35 +153,35 @@ public class VideoViewController: UIViewController {
     // MARK: - Methods
     
     /// Resumes playback
-    public func play() {
+    open func play() {
         player.play()
     }
     
     /// Pauses playback
-    public func pause() {
+    open func pause() {
         player.pause()
     }
     
-    public func longPressed(gesture: UILongPressGestureRecognizer) {
-        let location = gesture.locationInView(gesture.view!)
+    open func longPressed(_ gesture: UILongPressGestureRecognizer) {
+        let location = gesture.location(in: gesture.view!)
         rewindTimelineView.zoom = (location.y - rewindTimelineView.center.y - 10.0) / 30.0
         
-        if gesture.state == .Began {
+        if gesture.state == .began {
             player.pause()
             rewindTimelineView.initialTime = CMTimeGetSeconds(playerItem.currentTime())
-            UIView.animateWithDuration(0.2, delay: 0.0, options: [.CurveEaseOut], animations: {
-                self.rewindDimView.effect = UIBlurEffect(style: .Dark)
+            UIView.animate(withDuration: 0.2, delay: 0.0, options: [.curveEaseOut], animations: {
+                self.rewindDimView.effect = UIBlurEffect(style: .dark)
                 self.rewindContentView.alpha = 1.0
                 }, completion: nil)
-        } else if gesture.state == .Changed {
+        } else if gesture.state == .changed {
             rewindTimelineView.rewindByDistance(previousLocationX - location.x)
         } else {
             player.play()
             
             let newTime = CMTime(seconds: rewindTimelineView.currentTime, preferredTimescale: playerItem.currentTime().timescale)
-            playerItem.seekToTime(newTime)
+            playerItem.seek(to: newTime)
             
-            UIView.animateWithDuration(0.2, delay: 0.0, options: [.CurveEaseOut], animations: {
+            UIView.animate(withDuration: 0.2, delay: 0.0, options: [.curveEaseOut], animations: {
                 self.rewindDimView.effect = nil
                 self.rewindContentView.alpha = 0.0
                 }, completion: nil)
@@ -192,13 +192,13 @@ public class VideoViewController: UIViewController {
         }
     }
 
-    override public func prefersStatusBarHidden() -> Bool {
+    override open var prefersStatusBarHidden : Bool {
         return true
     }
 
     // MARK: - Layout
 
-    override public func viewWillLayoutSubviews() {
+    override open func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         
         playerLayer.frame = view.bounds
@@ -215,7 +215,7 @@ public class VideoViewController: UIViewController {
         rewindTimelineView.frame = CGRect(x: 0.0, y: rewindCurrentTimeLabel.frame.maxY + verticalSpacing, width: rewindContentView.bounds.width, height: timelineHeight)
         rewindPreviewShadowLayer.frame = rewindPreviewImageView.frame
         
-        let path = UIBezierPath(roundedRect: rewindPreviewImageView.bounds, cornerRadius: 5.0).CGPath
+        let path = UIBezierPath(roundedRect: rewindPreviewImageView.bounds, cornerRadius: 5.0).cgPath
         rewindPreviewShadowLayer.shadowPath = path
         (rewindPreviewImageView.layer.mask as! CAShapeLayer).path = path
     }
